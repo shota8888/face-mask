@@ -7,6 +7,8 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
     <script>
       $(document).ready(function () {
         $("body").bootstrapMaterialDesign();
@@ -15,14 +17,14 @@
     <link rel="stylesheet" href="face-mask.css" />
   </head>
   <body>
-    <video id="video" hidden></video>
-    <canvas id="canvas"></canvas>
+    <video id="video" width="853" height="480" hidden></video>
+    <canvas id="canvas" width="853" height="480"></canvas>
     <script src="face-mask.js"></script>
-    <button type="button" class="btn" onclick="changeStamp(0)"><!-- <img src="stamp0.png" width="80" height="80"> -->None</button>
-    <button type="button" class="btn" onclick="changeStamp(1)"><!-- <img src="stamp1.png" width="80" height="80"> -->Stamp 1</button>
-    <button type="button" class="btn" onclick="changeStamp(2)"><!-- <img src="stamp2.png" width="80" height="80"> -->Stamp 2</button>
-    <button type="button" class="btn" onclick="changeStamp(3)"><!-- <img src="stamp3.png" width="80" height="80"> -->Stamp 3</button>
-    <button type="button" class="btn" onclick="changeStamp(4)"><!-- <img src="stamp4.png" width="80" height="80"> -->Stamp 4</button>
+    <button type="button" class="btn" onclick="handleSetValue(0)"><!-- <img src="stamp0.png" width="80" height="80"> -->None</button>
+    <button type="button" class="btn" onclick="handleSetValue(1)"><!-- <img src="stamp1.png" width="80" height="80"> -->Stamp 1</button>
+    <button type="button" class="btn" onclick="handleSetValue(2)"><!-- <img src="stamp2.png" width="80" height="80"> -->Stamp 2</button>
+    <button type="button" class="btn" onclick="handleSetValue(3)"><!-- <img src="stamp3.png" width="80" height="80"> -->Stamp 3</button>
+    <button type="button" class="btn" onclick="handleSetValue(4)"><!-- <img src="stamp4.png" width="80" height="80"> -->Stamp 4</button>
     <!-- <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Filter</button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       <a class="dropdown-item" href="javascript:changeFilter(0);">None</a>

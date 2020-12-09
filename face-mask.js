@@ -1,4 +1,8 @@
 let filter;
+let stampValue = 0;
+let catEars = new Image();
+catEars.src = "catEars.png";
+
 function selectFilter() {
   filter = document.getElementById("filter").value;
 }
@@ -7,6 +11,13 @@ function resetValue() {
   stampValue = 0;
   filter = null;
 }
+// スタンプ変更
+function handleSetValue(num) {
+  stampValue = num;
+}
+
+// スタンプの表示処理
+// (顔の位置データ, 画像, 顔の部位, 大きさ)
 
 async function main() {
   // 表示用のCanvas
@@ -17,9 +28,18 @@ async function main() {
   const offscreenCtx = offscreen.getContext("2d");
   // カメラから映像を取得するためのvideo要素
   const video = document.createElement("video");
+  video.width = 853;
+  video.height = 480;
 
   const stream = await navigator.mediaDevices.getUserMedia({
     video: { facingMode: "user" },
+  });
+
+  net = await posenet.load({
+    architecture: 'MobileNetV1',
+    outputStride: 16,
+    inputResolution: { width: 853, height: 480 },
+    multiplier: 0.75
   });
 
   video.srcObject = stream;
@@ -30,6 +50,7 @@ async function main() {
     canvas.height = offscreen.height = video.videoHeight;
 
     tick();
+    changeStamp()
   };
 
   function tick() {
@@ -65,11 +86,34 @@ async function main() {
     window.requestAnimationFrame(tick);
   }
 
-  // スタンプ変更
-  function changeStamp(num) {
-    stampValue = num;
-    drawCanvas();
+  function changeStamp() {
+    switch (stampValue) {
+      case 1:
+        drawStamp(catEars, 2, 0, 0, 0);
+        break;
+    
+      default:
+        break;
+    } 
+
+    requestAnimationFrame(changeStamp);
   }
+
+  async function drawStamp(img, key, scale, hShift, vShift) {
+    pose = await net.estimateSinglePose(video);
+    let eyes = pose.keypoints[1].position.x - pose.keypoints[2].position.x;
+    let nose = pose.keypoints[0].position.y - pose.keypoints[1].position.y;
+    let wScale = eyes / img.width;
+    let width = img.width * scale * wScale;
+    let height = img.height * scale * wScale;
+    let x = pose.keypoints[key].position.x - width / 2 + eyes * hShift;
+    let y = pose.keypoints[key].position.y - height / 2 + nose * vShift;
+
+    console.log(img)
+
+    ctx.drawImage(img, x, y, width, height)
+  }
+
 
   /////////// ↓フィルター処理  ///////////
   function grayScale(data) {
