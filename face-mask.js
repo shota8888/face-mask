@@ -5,7 +5,7 @@ function selectFilter() {
 
 function resetValue() {
   stampValue = 0;
-  filter = null;
+  document.getElementById("filter").selectedIndex = filter = "none";
 }
 
 async function main() {
