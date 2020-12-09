@@ -1,5 +1,6 @@
 let filter;
-let stampValue = 0;
+let stampValue = 1;
+let net, pose;
 let catEars = new Image();
 catEars.src = "catEars.png";
 
@@ -21,11 +22,16 @@ function handleSetValue(num) {
 
 async function main() {
   // 表示用のCanvas
+  console.log(catEars)
   const canvas = document.getElementById("canvas");
   const ctx = canvas.getContext("2d");
   // 画像処理用のオフスクリーンCanvas
   const offscreen = document.createElement("canvas");
   const offscreenCtx = offscreen.getContext("2d");
+
+  // const stampCanvas = document.getElementById("stamp-canvas");
+  // const stampCtx = stampCanvas.getContext("2d");
+
   // カメラから映像を取得するためのvideo要素
   const video = document.createElement("video");
   video.width = 853;
@@ -42,6 +48,15 @@ async function main() {
     multiplier: 0.75
   });
 
+  let eyes;
+  let nose;
+  let wScale;
+  let width;
+  let height;
+  let x;
+  let y;
+
+
   video.srcObject = stream;
   video.onloadedmetadata = () => {
     video.play();
@@ -50,7 +65,7 @@ async function main() {
     canvas.height = offscreen.height = video.videoHeight;
 
     tick();
-    changeStamp()
+    // changeStamp()
   };
 
   function tick() {
@@ -83,37 +98,39 @@ async function main() {
 
     offscreenCtx.putImageData(imageData, 0, 0);
     ctx.drawImage(offscreen, 0, 0);
+
+
+    drawStamp(catEars, 2, 3.0, 0.0, 0.0);
+    ctx.drawImage(catEars, x, y, width, height)
+
     window.requestAnimationFrame(tick);
   }
 
   function changeStamp() {
     switch (stampValue) {
       case 1:
-        drawStamp(catEars, 2, 0, 0, 0);
+        drawStamp(catEars, 2.0, 0.5, 0, 0);
         break;
-    
       default:
         break;
     } 
 
-    requestAnimationFrame(changeStamp);
+    window.requestAnimationFrame(changeStamp);
   }
 
   async function drawStamp(img, key, scale, hShift, vShift) {
+    // ctx.drawImage(img, 0, 0);
     pose = await net.estimateSinglePose(video);
-    let eyes = pose.keypoints[1].position.x - pose.keypoints[2].position.x;
-    let nose = pose.keypoints[0].position.y - pose.keypoints[1].position.y;
-    let wScale = eyes / img.width;
-    let width = img.width * scale * wScale;
-    let height = img.height * scale * wScale;
-    let x = pose.keypoints[key].position.x - width / 2 + eyes * hShift;
-    let y = pose.keypoints[key].position.y - height / 2 + nose * vShift;
-
-    console.log(img)
-
-    ctx.drawImage(img, x, y, width, height)
+    
+    // ctx.clearRect(0, 0, canvas.width, canvas.height);
+    eyes = pose.keypoints[1].position.x - pose.keypoints[2].position.x;
+    nose = pose.keypoints[0].position.y - pose.keypoints[1].position.y;
+    wScale = eyes / img.width;
+    width = img.width * scale * wScale;
+    height = img.height * scale * wScale;
+    x = pose.keypoints[key].position.x - width / 2 + eyes * hShift;
+    y = pose.keypoints[key].position.y - height / 2 + nose * vShift;
   }
-
 
   /////////// ↓フィルター処理  ///////////
   function grayScale(data) {
