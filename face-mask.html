@@ -2,16 +2,26 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>第3回　Canvas と Tweakpane 課題</title>
+    <title>応用情報工学演習 Group12</title>
     <link rel="stylesheet" href="face-mask.css" />
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
     <script src="https://cdn.jsdelivr.net/npm/tweakpane@1.5.5/dist/tweakpane.min.js"></script>
   </head>
   <body>
-    <h2>第3回　Canvas と Tweakpane 課題</h2>
-    <video id="video" width="640" height="480" hidden></video>
-    <canvas id="myCanvas" width="640" height="480"></canvas>
+    <video id="video" hidden></video>
+    <canvas id="canvas"></canvas>
+
+    <select id="filter" onchange="selectFilter()">
+      <option value="">フィルターを選択</option>
+      <option value="gray">白黒</option>
+      <option value="negaPosi">ネガポジ変換</option>
+      <option value="binarization">二値化</option>
+      <option value="gamma">ガンマ補正</option>
+      <option value="sharpening">輪郭強調</option>
+      <option value="emboss">立体感</option>
+    </select>
+
     <script type="text/javascript" src="face-mask.js"></script>
   </body>
 </html>
