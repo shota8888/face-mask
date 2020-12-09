@@ -3,6 +3,11 @@ function selectFilter() {
   filter = document.getElementById("filter").value;
 }
 
+function resetValue() {
+  stampValue = 0;
+  filter = null;
+}
+
 async function main() {
   // 表示用のCanvas
   const canvas = document.getElementById("canvas");
@@ -60,6 +65,13 @@ async function main() {
     window.requestAnimationFrame(tick);
   }
 
+  // スタンプ変更
+  function changeStamp(num) {
+    stampValue = num;
+    drawCanvas();
+  }
+
+  /////////// ↓フィルター処理  ///////////
   function grayScale(data) {
     for (let i = 0; i < data.length; i += 4) {
       const color = (data[i] + data[i + 1] + data[i + 2]) / 3;
@@ -148,38 +160,7 @@ async function main() {
         data[i + 2] = embossColor(2, i);
       }
     }
-    console.log(filter)
   }
-
-  // function mosaic(data) {
-  //   const _data = data.slice();
-  //   const avgColor = (i, j, color) => {
-  //     // 3x3の平均値
-  //     const prev = ((i - 1) * canvas.width + j) * 4;
-  //     const curr = (i * canvas.width + j) * 4;
-  //     const next = ((i + 1) * canvas.width + j) * 4;
-
-  //     const sumPrevLineColor = _data[prev - 4 + color] + _data[prev + color] + _data[prev + 4 + color];
-  //     const sumCurrLineColor = _data[curr - 4 + color] + _data[curr + color] + _data[curr + 4 + color];
-  //     const sumNextLineColor = _data[next - 4 + color] + _data[next + color] + _data[next + 4 + color];
-
-  //     return (sumPrevLineColor + sumCurrLineColor + sumNextLineColor) / 9;
-  //   };
-
-  //   for (let i = 1; i < canvas.width; i += 3) {
-  //     for (let j = 1; j < canvas.height; j += 3) {
-  //       const prev = ((i - 1) * canvas.width + j) * 4;
-  //       const curr = (i * canvas.width + j) * 4;
-  //       const next = ((i + 1) * canvas.width + j) * 4;
-
-  //       ["r", "g", "b"].forEach((_, color) => {
-  //         data[prev - 4 + color] = data[prev + color] = data[prev + 4 + color] = avgColor(i, j, color);
-  //         data[curr - 4 + color] = data[curr + color] = data[curr + 4 + color] = avgColor(i, j, color);
-  //         data[next - 4 + color] = data[next + color] = data[next + 4 + color] = avgColor(i, j, color);
-  //       });
-  //     }
-  //   }
-  // }
 }
 
 main();

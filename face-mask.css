@@ -1,4 +1,14 @@
-#canvas {
-  width: 853px;
-  height: 480px;
+body {
+    width: 800px;
+    margin-left : auto;
+    margin-right: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+
 }
+
+#canvas {
+    width: 853px;
+    height: 480px;
+}
+  
