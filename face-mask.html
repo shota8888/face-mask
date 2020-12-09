@@ -17,13 +17,15 @@
   <body>
     <video id="video" hidden></video>
     <canvas id="canvas"></canvas>
-    <script src="face-mask.js"></script>
-    <button type="button" class="btn" onclick="changeStamp(0)"><!-- <img src="stamp0.png" width="80" height="80"> -->None</button>
-    <button type="button" class="btn" onclick="changeStamp(1)"><!-- <img src="stamp1.png" width="80" height="80"> -->Stamp 1</button>
-    <button type="button" class="btn" onclick="changeStamp(2)"><!-- <img src="stamp2.png" width="80" height="80"> -->Stamp 2</button>
-    <button type="button" class="btn" onclick="changeStamp(3)"><!-- <img src="stamp3.png" width="80" height="80"> -->Stamp 3</button>
-    <button type="button" class="btn" onclick="changeStamp(4)"><!-- <img src="stamp4.png" width="80" height="80"> -->Stamp 4</button>
-    <!-- <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Filter</button>
+    <div class="container">
+      <div class="stamp-contents">
+        <button type="button" class="btn" onclick="changeStamp(0)"><!-- <img src="stamp0.png" width="80" height="80"> -->None</button>
+        <button type="button" class="btn" onclick="changeStamp(1)"><!-- <img src="stamp1.png" width="80" height="80"> -->Stamp 1</button>
+        <button type="button" class="btn" onclick="changeStamp(2)"><!-- <img src="stamp2.png" width="80" height="80"> -->Stamp 2</button>
+        <button type="button" class="btn" onclick="changeStamp(3)"><!-- <img src="stamp3.png" width="80" height="80"> -->Stamp 3</button>
+        <button type="button" class="btn" onclick="changeStamp(4)"><!-- <img src="stamp4.png" width="80" height="80"> -->Stamp 4</button>
+      </div>
+      <!-- <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Filter</button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       <a class="dropdown-item" href="javascript:changeFilter(0);">None</a>
       <div class="dropdown-divider"></div>
@@ -34,15 +36,21 @@
       <a class="dropdown-item" href="javascript:changeFilter(5);">輪郭強調</a>
       <a class="dropdown-item" href="javascript:changeFilter(6);">立体感</a>
     </div> -->
-    <select id="filter" onchange="selectFilter()">
-      <option value="">Filter</option>
-      <option value="gray">白黒</option>
-      <option value="negaPosi">ネガポジ変換</option>
-      <option value="binarization">二値化</option>
-      <option value="gamma">ガンマ補正</option>
-      <option value="sharpening">輪郭強調</option>
-      <option value="emboss">立体感</option>
-    </select>
-    <button type="reset" class="btn btn-outline-danger" data-toggle="snackbar" onclick="resetValue()">Reset</button>
+      <div class="filter-contents sub-contents">
+        <select id="filter" class="custom-select" onchange="selectFilter()">
+          <option value="none">Filter</option>
+          <option value="gray">モノクロ</option>
+          <option value="negaPosi">反転</option>
+          <option value="binarization">二値化</option>
+          <option value="gamma">ガンマ補正</option>
+          <option value="sharpening">輪郭強調</option>
+          <option value="emboss">立体感</option>
+        </select>
+      </div>
+      <div class="reset-contents">
+        <button type="reset" class="btn btn-outline-danger" data-toggle="snackbar" onclick="resetValue()">Reset</button>
+      </div>
+    </div>
+    <script src="face-mask.js"></script>
   </body>
 </html>
