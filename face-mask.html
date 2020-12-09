@@ -1,17 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
-    <meta charset="UTF-8" />
-    <title>第3回　Canvas と Tweakpane 課題</title>
+    <meta charset="utf-8" />
+    <title>Face Mask</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous" />
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
+    <script>
+      $(document).ready(function () {
+        $("body").bootstrapMaterialDesign();
+      });
+    </script>
     <link rel="stylesheet" href="face-mask.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tweakpane@1.5.5/dist/tweakpane.min.js"></script>
   </head>
   <body>
-    <h2>第3回　Canvas と Tweakpane 課題</h2>
-    <video id="video" width="640" height="480" hidden></video>
-    <canvas id="myCanvas" width="640" height="480"></canvas>
-    <script type="text/javascript" src="face-mask.js"></script>
+    <video id="video" hidden></video>
+    <canvas id="canvas"></canvas>
+    <script src="face-mask.js"></script>
+    <button type="button" class="btn" onclick="changeStamp(0)"><!-- <img src="stamp0.png" width="80" height="80"> -->None</button>
+    <button type="button" class="btn" onclick="changeStamp(1)"><!-- <img src="stamp1.png" width="80" height="80"> -->Stamp 1</button>
+    <button type="button" class="btn" onclick="changeStamp(2)"><!-- <img src="stamp2.png" width="80" height="80"> -->Stamp 2</button>
+    <button type="button" class="btn" onclick="changeStamp(3)"><!-- <img src="stamp3.png" width="80" height="80"> -->Stamp 3</button>
+    <button type="button" class="btn" onclick="changeStamp(4)"><!-- <img src="stamp4.png" width="80" height="80"> -->Stamp 4</button>
+    <!-- <button class="btn btn-outline-primary dropdown-toggle" type="button" id="filterBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Filter</button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item" href="javascript:changeFilter(0);">None</a>
+      <div class="dropdown-divider"></div>
+      <a class="dropdown-item" href="javascript:changeFilter(1);">白黒</a>
+      <a class="dropdown-item" href="javascript:changeFilter(2);">ネガポジ変換</a>
+      <a class="dropdown-item" href="javascript:changeFilter(3);">二値化</a>
+      <a class="dropdown-item" href="javascript:changeFilter(4);">ガンマ補正</a>
+      <a class="dropdown-item" href="javascript:changeFilter(5);">輪郭強調</a>
+      <a class="dropdown-item" href="javascript:changeFilter(6);">立体感</a>
+    </div> -->
+    <select id="filter" onchange="selectFilter()">
+      <option value="">Filter</option>
+      <option value="gray">白黒</option>
+      <option value="negaPosi">ネガポジ変換</option>
+      <option value="binarization">二値化</option>
+      <option value="gamma">ガンマ補正</option>
+      <option value="sharpening">輪郭強調</option>
+      <option value="emboss">立体感</option>
+    </select>
+    <button type="reset" class="btn btn-outline-danger" data-toggle="snackbar" onclick="resetValue()">Reset</button>
   </body>
 </html>
