@@ -1,8 +1,34 @@
 let filter;
-let stampValue = 1;
+let stampValue = 0;
+
 let net, pose;
+
+let eyes, nose, wScale, width, height, x, y;
+
+// 画像
 let catEars = new Image();
-catEars.src = "catEars.png";
+let dogEars = new Image();
+let mask = new Image();
+let higeMegane = new Image();
+catEars.src = "Images/catEars.png";
+dogEars.src = "Images/dogEars.png";
+mask.src = "Images/mask.png";
+higeMegane.src = "Images/higeMegane.png";
+
+let image = catEars;
+
+// カメラから映像を取得するためのvideo要素
+const video = document.getElementById("video");
+video.width = 853;
+video.height = 480;
+
+// 表示用のCanvas
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+// 画像処理用のオフスクリーンCanvas
+const offscreen = document.createElement("canvas");
+const offscreenCtx = offscreen.getContext("2d");
+
 
 function selectFilter() {
   filter = document.getElementById("filter").value;
@@ -10,36 +36,22 @@ function selectFilter() {
 
 function resetValue() {
   stampValue = 0;
-  filter = null;
+  document.getElementById("filter").selectedIndex = filter = "none";
 }
-// スタンプ変更
+
 function handleSetValue(num) {
   stampValue = num;
 }
 
-// スタンプの表示処理
-// (顔の位置データ, 画像, 顔の部位, 大きさ)
 
 async function main() {
-  // 表示用のCanvas
-  console.log(catEars)
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
-  // 画像処理用のオフスクリーンCanvas
-  const offscreen = document.createElement("canvas");
-  const offscreenCtx = offscreen.getContext("2d");
-
-  // const stampCanvas = document.getElementById("stamp-canvas");
-  // const stampCtx = stampCanvas.getContext("2d");
-
-  // カメラから映像を取得するためのvideo要素
-  const video = document.createElement("video");
-  video.width = 853;
-  video.height = 480;
-
   const stream = await navigator.mediaDevices.getUserMedia({
     video: { facingMode: "user" },
   });
+
+  video.srcObject = stream;
+
+  await new Promise(resolve => {video.onloadedmetadata = () => {resolve(video);};});
 
   net = await posenet.load({
     architecture: 'MobileNetV1',
@@ -48,25 +60,14 @@ async function main() {
     multiplier: 0.75
   });
 
-  let eyes;
-  let nose;
-  let wScale;
-  let width;
-  let height;
-  let x;
-  let y;
+  video.play(); 
 
+  canvas.width = offscreen.width = video.videoWidth;
+  canvas.height = offscreen.height = video.videoHeight; 
 
-  video.srcObject = stream;
-  video.onloadedmetadata = () => {
-    video.play();
-
-    canvas.width = offscreen.width = video.videoWidth;
-    canvas.height = offscreen.height = video.videoHeight;
-
-    tick();
-    // changeStamp()
-  };
+  tick(); 
+  changeStamp();
+}
 
   function tick() {
     offscreenCtx.drawImage(video, 0, 0);
@@ -99,17 +100,31 @@ async function main() {
     offscreenCtx.putImageData(imageData, 0, 0);
     ctx.drawImage(offscreen, 0, 0);
 
-
-    drawStamp(catEars, 2, 3.0, 0.0, 0.0);
-    ctx.drawImage(catEars, x, y, width, height)
+    if (stampValue != 0) {
+      ctx.drawImage(image, x, y, width, height)
+    }
 
     window.requestAnimationFrame(tick);
   }
 
+  // スタンプ変更
   function changeStamp() {
     switch (stampValue) {
       case 1:
-        drawStamp(catEars, 2.0, 0.5, 0, 0);
+        setPosition(catEars, 2, 3.5, 2.8, -1.8);
+        image = catEars;
+        break;
+      case 2:
+        setPosition(dogEars, 2, 3.8, 2.8, -1.0);
+        image = dogEars;
+        break;
+      case 3: 
+        setPosition(mask, 0, 3.8, 2.1, 3.3);
+        image = mask;
+        break;
+      case 4:
+        setPosition(higeMegane, 0, 3.2, 2.15, 1.8);
+        image = higeMegane;
         break;
       default:
         break;
@@ -118,11 +133,18 @@ async function main() {
     window.requestAnimationFrame(changeStamp);
   }
 
-  async function drawStamp(img, key, scale, hShift, vShift) {
-    // ctx.drawImage(img, 0, 0);
+  /**
+   * 
+   * @param img 画像
+   * @param key 顔の部位 
+   * 0: nose, 1: leftEye, 2: rightEye, 3: leftEar, 4: rightEar
+   * @param scale 大きさ
+   * @param hShift 横シフト
+   * @param vShift 縦シフト
+   */
+  async function setPosition(img, key, scale, hShift, vShift) {
     pose = await net.estimateSinglePose(video);
-    
-    // ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     eyes = pose.keypoints[1].position.x - pose.keypoints[2].position.x;
     nose = pose.keypoints[0].position.y - pose.keypoints[1].position.y;
     wScale = eyes / img.width;
@@ -222,6 +244,5 @@ async function main() {
       }
     }
   }
-}
 
 main();
