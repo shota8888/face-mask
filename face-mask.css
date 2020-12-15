@@ -1,8 +1,6 @@
 body {
-  width: 853px;
+  width: 893px;
   margin: 20px auto;
-  vertical-align: middle;
-  position: relative;
 }
 
 #canvas {
@@ -10,62 +8,8 @@ body {
   height: 480px;
 }
 
-.container {
+.card-margin-height {
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  margin-top: 15px;
-}
-
-.filter-contents {
-  overflow: hidden;
-  width: 18%;
-  height: 38px;
-  text-align: center;
-}
-
-.filter-contents select {
-  width: 100%;
-  padding-right: 1em;
-  cursor: pointer;
-  text-indent: 0.01px;
-  text-overflow: ellipsis;
-  border: none;
-  outline: none;
-  background: transparent;
-  background-image: none;
-  box-shadow: none;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.filter-contents select::-ms-expand {
-  display: none;
-}
-
-.filter-contents.sub-contents {
-  position: relative;
-  border-radius: 2px;
-  border: 1px solid #3ca0da;
-  background: #ffffff;
-}
-
-.filter-contents.sub-contents::before {
-  position: absolute;
-  top: 0.8em;
-  right: 0.8em;
-  width: 0;
-  height: 0;
-  padding: 0;
-  content: "";
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 6px solid #3ca0da;
-  pointer-events: none;
-}
-
-.filter-contents.sub-contents select {
-  height: auto;
-  color: #3ca0da;
-  font-size: 14px;
+  justify-content: space-between;
+  margin: 20px 0px;
 }
