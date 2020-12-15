@@ -1,45 +1,75 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <title>Face Mask</title>
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous" />
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
-    <script>
-      $(document).ready(function () {
-        $("body").bootstrapMaterialDesign();
-      });
-    </script>
-    <link rel="stylesheet" href="face-mask.css" />
-  </head>
-  <body>
-    <video id="video" width="853" height="480" hidden></video>
-    <canvas id="canvas" width="853" height="480"></canvas>
-    <script src="face-mask.js"></script>
-    <button type="button" class="btn" onclick="handleSetValue(0)">スタンプリセット</button>
-    <button type="button" class="btn" onclick="handleSetValue(1)"><img src="Images/catEars.png" width="100" height="60"></button>
-    <button type="button" class="btn" onclick="handleSetValue(2)"><img src="Images/dogEars.png" width="100" height="60"></button>
-    <button type="button" class="btn" onclick="handleSetValue(3)"><img src="Images/mask.png" width="100" height="60"></button>
-    <button type="button" class="btn" onclick="handleSetValue(4)"><img src="Images/higemegane.png" width="80" height="80"></button>
-      <div class="filter-contents sub-contents">
-        <select id="filter" class="custom-select" onchange="selectFilter()">
-          <option value="none">Filter</option>
-          <option value="gray">モノクロ</option>
-          <option value="negaPosi">反転</option>
-          <option value="binarization">二値化</option>
-          <option value="gamma">ガンマ補正</option>
-          <option value="sharpening">輪郭強調</option>
-          <option value="emboss">立体感</option>
-        </select>
+<head>
+  <meta charset="utf-8">
+  <title>Face mask</title>
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U" crossorigin="anonymous"></script>
+  <script src="https://cdn.rawgit.com/FezVrasta/snackbarjs/1.1.0/dist/snackbar.min.js"></script>
+  <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
+  <script>
+    $(document).ready(function() {
+      $('body').bootstrapMaterialDesign();
+      $('[data-toggle="tooltip"]').tooltip();
+    });
+  </script>
+  <link rel="stylesheet" href="face-mask.css" />
+</head>
+<body>
+  <div class="card card-margin-height">
+      <div class="card-body">
+          <video id="video" width="853" height="480" hidden></video>
+          <canvas id="canvas" width="853" height="480"></canvas><br>
       </div>
-      <div class="reset-contents">
-        <button type="reset" class="btn btn-outline-danger" data-toggle="snackbar" onclick="resetValue()">Reset</button>
+  </div>
+  <div class="row card-margin-height">
+    <div class="card w-auto card-margin-width">
+      <div class="card-header">
+        スタンプ (S)
+      </div>
+      <div class="card-body">
+        <table>
+          <tr>
+            <td><button type="button" class="btn active" id="stampBtn0" data-toggle="tooltip" data-placement="top" title="なし" onclick="handleSetValue(0)">なし</button></td>
+            <td><button type="button" class="btn" id="stampBtn1" data-toggle="tooltip" data-placement="top" title="猫耳" onclick="handleSetValue(1)"><img src="Images/catEars.png" width="70" height="40"></button></td>
+            <td><button type="button" class="btn" id="stampBtn2" data-toggle="tooltip" data-placement="top" title="犬耳" onclick="handleSetValue(2)"><img src="Images/dogEars.png" width="70" height="33"></button></td>
+            <td><button type="button" class="btn" id="stampBtn3" data-toggle="tooltip" data-placement="top" title="マスク" onclick="handleSetValue(3)"><img src="Images/mask.png" width="70" height="42"></button></td>
+            <td><button type="button" class="btn" id="stampBtn4" data-toggle="tooltip" data-placement="top" title="ひげ眼鏡" onclick="handleSetValue(4)"><img src="Images/higemegane.png" width="70" height="66"></button></td>
+          </tr>
+        </table>
       </div>
     </div>
-    <script src="face-mask.js"></script>
-  </body>
+    <div class="card w-auto card-margin-width">
+      <div class="card-header">
+        フィルタ・リセット
+      </div>
+      <div class="card-body">
+        <table>
+          <tr>
+            <button class="btn btn-primary dropdown-toggle" type="button" id="filterBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              フィルタ (F)
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item active" id="filterBtn0" href="javascript:selectFilter(0);">なし</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" id="filterBtn1" href="javascript:selectFilter(1);">モノクロ</a>
+              <a class="dropdown-item" id="filterBtn2" href="javascript:selectFilter(2);">反転</a>
+              <a class="dropdown-item" id="filterBtn3" href="javascript:selectFilter(3);">二値化</a>
+              <a class="dropdown-item" id="filterBtn4" href="javascript:selectFilter(4);">ガンマ補正</a>
+              <a class="dropdown-item" id="filterBtn5" href="javascript:selectFilter(5);">輪郭強調</a>
+              <a class="dropdown-item" id="filterBtn6" href="javascript:selectFilter(6);">立体感</a>
+            </div>
+          </tr>
+          <tr>
+            <button type="reset" class="btn btn-danger" id="resetBtn" data-toggle="snackbar" data-content="リセットされました <a href='javascript:cancelReset();' class='btn btn-info'>取消</a> <a href='#' class='btn btn-info'>閉じる</a>" data-html-allowed="true" data-timeout="0" onclick="resetValue()">リセット (R)</button>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script src="face-mask.js"></script>
+</body>
 </html>

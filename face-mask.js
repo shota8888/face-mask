@@ -1,5 +1,24 @@
+document.body.addEventListener("keydown", event => {
+  switch (event.key) {
+    case 'f':
+      document.getElementById(`filterBtn${(filterValue + 1) % 7}`).click();
+      break;
+    case 's':
+      document.getElementById(`stampBtn${(stampValue + 1) % 5}`).click();
+      break;
+    case 'r':
+      document.getElementById("resetBtn").click();
+      break;
+    default:
+      break;
+  }
+});
+
 let filter;
+let filterValue = 0;
+let filterValueBackup;
 let stampValue = 0;
+let stampValueBackup;
 
 let net, pose;
 
@@ -30,16 +49,57 @@ const offscreen = document.createElement("canvas");
 const offscreenCtx = offscreen.getContext("2d");
 
 
-function selectFilter() {
-  filter = document.getElementById("filter").value;
+function selectFilter(num) {
+  for (var i = 0; i < 7; i++) {
+    document.getElementById(`filterBtn${i}`).classList.remove("active");
+  }
+
+  document.getElementById(`filterBtn${num}`).classList.add("active");
+  filterValue = num;
+
+  switch (filterValue) {
+    case 1:
+      filter = "gray"
+      break;
+    case 2:
+      filter = "negaPosi"
+      break;
+    case 3: 
+      filter = "binarization"
+      break;
+    case 4:
+      filter = "gamma"
+      break;
+    case 5:
+      filter = "sharpening"
+      break;
+    case 6:
+      filter = "emboss"
+      break;
+    default:
+      filter = "none"
+      break;
+  }
 }
 
 function resetValue() {
-  stampValue = 0;
-  document.getElementById("filter").selectedIndex = filter = "none";
+  filterValueBackup = filterValue;
+  selectFilter(0)
+  stampValueBackup = stampValue;
+  handleSetValue(0)
+}
+
+function cancelReset() {
+  selectFilter(filterValueBackup)
+  handleSetValue(stampValueBackup)
 }
 
 function handleSetValue(num) {
+  for (var i = 0; i < 5; i++) {
+    document.getElementById(`stampBtn${i}`).classList.remove("active");
+  }
+
+  document.getElementById(`stampBtn${num}`).classList.add("active");
   stampValue = num;
 }
 
