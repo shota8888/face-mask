@@ -36,17 +36,16 @@ higeMegane.src = "Images/higeMegane.png";
 
 let image = catEars;
 
-// カメラから映像を取得するためのvideo要素
 const video = document.getElementById("video");
 video.width = 853;
 video.height = 480;
 
-// 表示用のCanvas
+// 表示用Canvas
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-// 画像処理用のオフスクリーンCanvas
-const offscreen = document.createElement("canvas");
-const offscreenCtx = offscreen.getContext("2d");
+// 画像処理用Canvas
+const processingCanvas = document.createElement("canvas");
+const processingCanvasCtx = processingCanvas.getContext("2d");
 
 
 function selectFilter(num) {
@@ -122,17 +121,17 @@ async function main() {
 
   video.play(); 
 
-  canvas.width = offscreen.width = video.videoWidth;
-  canvas.height = offscreen.height = video.videoHeight; 
+  canvas.width = processingCanvas.width = video.videoWidth;
+  canvas.height = processingCanvas.height = video.videoHeight; 
 
-  tick(); 
+  draw(); 
   changeStamp();
 }
 
-  function tick() {
-    offscreenCtx.drawImage(video, 0, 0);
+  function draw() {
+    processingCanvasCtx.drawImage(video, 0, 0);
     // イメージデータを取得
-    const imageData = offscreenCtx.getImageData(0, 0, offscreen.width, offscreen.height);
+    const imageData = processingCanvasCtx.getImageData(0, 0, processingCanvas.width, processingCanvas.height);
     
     // イメージデータを直接書き換える
     switch (filter) {
@@ -157,14 +156,14 @@ async function main() {
       default:
     }
 
-    offscreenCtx.putImageData(imageData, 0, 0);
-    ctx.drawImage(offscreen, 0, 0);
+    processingCanvasCtx.putImageData(imageData, 0, 0);
+    ctx.drawImage(processingCanvas, 0, 0);
 
     if (stampValue != 0) {
       ctx.drawImage(image, x, y, width, height)
     }
 
-    window.requestAnimationFrame(tick);
+    window.requestAnimationFrame(draw);
   }
 
   // スタンプ変更
@@ -214,11 +213,11 @@ async function main() {
     y = pose.keypoints[key].position.y - height / 2 + nose * vShift;
   }
 
-  /////////// ↓フィルター処理  ///////////
+  // フィルター処理
   function grayScale(data) {
     for (let i = 0; i < data.length; i += 4) {
-      const color = (data[i] + data[i + 1] + data[i + 2]) / 3;
-      data[i] = data[i + 1] = data[i + 2] = color;
+      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      data[i] = data[i + 1] = data[i + 2] = avg;
     }
   }
 
@@ -232,55 +231,45 @@ async function main() {
 
   function binarization(data) {
     const threshold = 255 / 2;
-
-    const getColor = (data, i) => {
+    const judgBinari = (data, i) => {
       const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-      if (threshold < avg) {
-        // white
-        return 255;
-      } else {
-        // black
-        return 0;
-      }
+      return threshold < avg ? 255 : 0; // RGBの平均が閾値を超えたら白
     };
 
     for (let i = 0; i < data.length; i += 4) {
-      const color = getColor(data, i);
+      const color = judgBinari(data, i);
       data[i] = data[i + 1] = data[i + 2] = color;
     }
   }
 
   function gamma(data) {
+    // 明るくしたい場合はgammaを大きくする
     const gamma = 2.0;
-
-    const correctify = (val) => 255 * Math.pow(val / 255, 1 / gamma);
-
+    const conversion = (val) => 255 * Math.pow(val / 255, 1 / gamma);
     for (let i = 0; i < data.length; i += 4) {
-      data[i] = correctify(data[i]);
-      data[i + 1] = correctify(data[i + 1]);
-      data[i + 2] = correctify(data[i + 2]);
+      data[i] = conversion(data[i]);
+      data[i + 1] = conversion(data[i + 1]);
+      data[i + 2] = conversion(data[i + 2]);
     }
   }
 
   function sharpening(data) {
-    const _data = data.slice();
+    const dupData = data.slice();
     const sharpedColor = (color, i) => {
       const sub = -1;
       const main = 10;
-
       const prevLine = i - canvas.width * 4;
       const nextLine = i + canvas.width * 4;
 
-      const sumPrevLineColor = _data[prevLine - 4 + color] * sub + _data[prevLine + color] * sub + _data[prevLine + 4 + color] * sub;
-      const sumCurrLineColor = _data[i - 4 + color] * sub + _data[i + color] * main + _data[i + 4 + color] * sub;
-      const sumNextLineColor = _data[nextLine - 4 + color] * sub + _data[nextLine + color] * sub + _data[nextLine + 4 + color] * sub;
+      const sumPrevLine = (dupData[prevLine - 4 + color] + dupData[prevLine + color] + dupData[prevLine + 4 + color]) * sub;
+      const sumCurrLine = (dupData[i - 4 + color] + dupData[i + 4 + color]) * sub + dupData[i + color] * main;
+      const sumNextLine = (dupData[nextLine - 4 + color] + dupData[nextLine + color] + dupData[nextLine + 4 + color]) * sub;
 
-      return (sumPrevLineColor + sumCurrLineColor + sumNextLineColor) / 2;
+      return (sumPrevLine + sumCurrLine + sumNextLine) / 2;
     };
 
     for (let i = canvas.width * 4; i < data.length - canvas.width * 4; i += 4) {
-      if (i % (canvas.width * 4) === 0 || i % (canvas.width * 4 + 300) === 0) {
-      } else {
+      if (i % (canvas.width * 4) !== 0 && i % (canvas.width * 4 + 300) !== 0) {
         data[i] = sharpedColor(0, i);
         data[i + 1] = sharpedColor(1, i);
         data[i + 2] = sharpedColor(2, i);
@@ -289,15 +278,14 @@ async function main() {
   }
 
   function emboss(data) {
-    const _data = data.slice();
+    const dupData = data.slice();
     const embossColor = (color, i) => {
       const prevLine = i - canvas.width * 4;
-      return _data[prevLine - 4 + color] * -1 + _data[i + color] + 255 / 2;
+      return (dupData[prevLine - 4 + color] * -1 + dupData[i + color]) + (255 / 2);
     };
 
     for (let i = canvas.width * 4; i < data.length - canvas.width * 4; i += 4) {
-      if (i % (canvas.width * 4) === 0 || i % (canvas.width * 4 + 300) === 0) {
-      } else {
+      if (i % (canvas.width * 4) !== 0 && i % ((canvas.width * 4) + 300) !== 0) {
         data[i] = embossColor(0, i);
         data[i + 1] = embossColor(1, i);
         data[i + 2] = embossColor(2, i);
